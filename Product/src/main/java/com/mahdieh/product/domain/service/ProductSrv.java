@@ -33,29 +33,27 @@ public class ProductSrv {
         return returnData;
     }
 
-    public List<Quantity> getQuantity(List<Integer> productKeys) throws Exception{
+    public List<Quantity> getQuantity(List<Integer> productKeys) throws Exception {
         return Utility.Product2Quantity(productDao.findByProductpkIn(productKeys));
     }
 
-    public String delete(Integer code) throws Exception{
+    public String delete(Integer code) throws Exception {
         productDao.deleteById(code);
         return "{'code':1,'message':'record code "+code+" is deleted'}";
     }
 
-    public String save(Product viewProduct) throws Exception{
-        if (viewProduct.getProductpk()==null){//maybe new person
-            return "{'code':1,'message':'record code \"+proDao.save(viewProduct).getProductpk()+\" is added'}";
-        }else {//Exist NationalKey=> Edit Current person
-            List<Product> dbproduct = productDao.findByProductpk(viewProduct.getProductpk());
-            if (dbproduct.size()==0)
-                return "{'code':0,'message':'record code "+ viewProduct.getProductpk()+" is Not found'}";
-            else
-                return "{'code':0,'message':'record code "+ updateProduct(viewProduct, dbproduct.get(0))+" is Not found'}";
+    public String save(Product viewProduct) throws Exception {
+        if(viewProduct.getProductpk()==null) {//not pk => maybe New person
+            return "{'code':1,'message':'record code "+productDao.save(viewProduct).getProductpk()+" is added'}";
+        }else {//Exist NationalKey  => Edit Current person
+            List<Product> dbProduct = productDao.findByProductpk(viewProduct.getProductpk());
+            if(dbProduct.size()==0) return "{'code':0,'message':'record code "+ viewProduct.getProductpk()+" is Not found'}";
+            else return "{'code':2,'message':'record code "+updateProduct(viewProduct, dbProduct.get(0))+" is updated'}";
         }
     }
-
     public Integer updateProduct(Product viewProduct, Product dbProduct){
-        dbProduct.setProductname(dbProduct.getProductname());
+        //update person
+        dbProduct.setProductname(viewProduct.getProductname());
         dbProduct.setCategoryfk(viewProduct.getCategoryfk()) ;
         dbProduct.setVendor(viewProduct.getVendor());
         dbProduct.setQuantity(viewProduct.getQuantity());
